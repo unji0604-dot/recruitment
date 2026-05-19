@@ -828,18 +828,53 @@
   }
 
   function submit() {
-    document.getElementById('step3Card').innerHTML = `
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9ans4ul2bsREJSrXHho7jQjJrdVAizoeOUP1d80kAMnIW1kEoz4dvJvKO3GEnOSQc7Q/exec';
+
+    const entries = Object.entries(state.dateTimeMap)
+      .filter(([, times]) => times.size > 0)
+      .sort(([a], [b]) => a.localeCompare(b));
+
+    const schedule = entries.map(([dateStr, times]) => {
+      const [, m, d] = dateStr.split('-');
+      return `${parseInt(m)}월 ${parseInt(d)}일: ${[...times].sort().join(', ')}`;
+    }).join(' / ');
+
+    const card = document.getElementById('step3Card');
+    card.innerHTML = `
       <div class="success-screen">
-        <span class="success-icon">🎉</span>
-        <h2>신청이 완료되었습니다!</h2>
-        <p>
-          참여 신청해 주셔서 감사합니다.<br>
-          선택하신 일정 중 확정 후 <strong>${state.email}</strong>로<br>
-          안내 메일을 보내드리겠습니다.
-        </p>
-      </div>
-    `;
-    document.getElementById('progressFill').style.width = '100%';
+        <span class="success-icon">⏳</span>
+        <h2>제출 중...</h2>
+      </div>`;
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: state.email, schedule })
+    })
+    .then(() => {
+      card.innerHTML = `
+        <div class="success-screen">
+          <span class="success-icon">🎉</span>
+          <h2>신청이 완료되었습니다!</h2>
+          <p>
+            참여 신청해 주셔서 감사합니다.<br>
+            선택하신 일정 중 확정 후 <strong>${state.email}</strong>로<br>
+            안내 메일을 보내드리겠습니다.
+          </p>
+        </div>`;
+      document.getElementById('progressFill').style.width = '100%';
+    })
+    .catch(() => {
+      card.innerHTML = `
+        <div class="success-screen">
+          <span class="success-icon">⚠️</span>
+          <h2>오류가 발생했습니다</h2>
+          <p>잠시 후 다시 시도해 주세요.</p>
+          <br>
+          <button class="btn btn-ghost" onclick="goTo(2)">← 돌아가기</button>
+        </div>`;
+    });
   }
 
   // ── Init ──
