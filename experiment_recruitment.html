@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>실험 참가자 모집</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #f5f0e8;
+      --ink: #1a1714;
+      --accent: #c4622d;
+      --muted: #8a7f74;
+      --line: #d9d0c3;
+      --selected-bg: #c4622d;
+      --selected-fg: #f5f0e8;
+      --hover: #ede6d8;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Noto Serif KR', serif;
+      background: var(--cream);
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    /* ── LAYOUT ── */
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* progress bar */
+    .progress-track {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--line);
+      z-index: 100;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.5s cubic-bezier(.77,0,.18,1);
+    }
+
+    /* step indicator */
+    .step-indicator {
+      position: fixed;
+      top: 18px; right: 28px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      z-index: 100;
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px 40px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(32px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.77,0,.18,1);
+    }
+    .screen.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+    .screen.exit {
+      opacity: 0;
+      transform: translateY(-32px);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 52px 56px;
+      box-shadow: 0 4px 40px rgba(26,23,20,0.07);
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .card::-webkit-scrollbar { width: 4px; }
+    .card::-webkit-scrollbar-thumb { background: var(--line); }
+
+    /* ── SCREEN 1 – INTRO ── */
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tag::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    h1 {
+      font-size: clamp(22px, 3.5vw, 30px);
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-body {
+      font-size: 15px;
+      line-height: 1.85;
+      color: #3d3630;
+      margin-bottom: 32px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .info-item {
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+      border-radius: 2px;
+    }
+    .info-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* ── SCREEN 2 – CALENDAR ── */
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    /* Month nav */
+    .month-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .month-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+    }
+    .nav-btn {
+      background: none;
+      border: 1px solid var(--line);
+      width: 32px; height: 32px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink);
+      transition: background 0.15s;
+    }
+    .nav-btn:hover { background: var(--hover); }
+
+    /* Calendar grid */
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .cal-day-header {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-align: center;
+      color: var(--muted);
+      padding-bottom: 8px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 2px;
+      border: 1px solid transparent;
+      transition: background 0.12s, border-color 0.12s;
+      position: relative;
+    }
+    .cal-day:hover:not(.empty):not(.past) { background: var(--hover); border-color: var(--line); }
+    .cal-day.empty { pointer-events: none; }
+    .cal-day.past { color: var(--line); pointer-events: none; }
+    .cal-day.today { font-weight: 700; color: var(--accent); }
+    .cal-day.selected {
+      background: var(--selected-bg);
+      color: var(--selected-fg);
+      border-color: var(--selected-bg);
+    }
+    .cal-day.selected::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      width: 4px; height: 4px;
+      background: rgba(245,240,232,0.6);
+      border-radius: 50%;
+    }
+
+    /* Time slots */
+    .cal-day.active-date {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+    .time-section {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      margin-top: 4px;
+      animation: fadeSlide 0.2s ease;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .time-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .time-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .time-chip {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      border: 1px solid var(--line);
+      padding: 6px 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      background: #fff;
+    }
+    .time-chip:hover { background: var(--hover); }
+    .time-chip.selected {
+      background: var(--selected-bg);
+      color: var(--selected-fg);
+      border-color: var(--selected-bg);
+    }
+
+    /* Selection summary */
+    .selection-summary {
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: var(--cream);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 42px;
+      line-height: 1.7;
+    }
+    .selection-summary span {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* ── SCREEN 3 – EMAIL ── */
+    .email-icon {
+      width: 48px; height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: 24px;
+    }
+
+    .field-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .email-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-family: 'DM Mono', monospace;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 8px;
+    }
+    .email-input:focus { border-color: var(--accent); }
+    .email-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    /* confirmation box */
+    .confirm-box {
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.7;
+      background: var(--cream);
+      margin-bottom: 28px;
+    }
+    .confirm-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .confirm-key {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      min-width: 80px;
+      padding-top: 2px;
+    }
+    .confirm-val { color: var(--ink); font-size: 13px; }
+
+    /* success state */
+    .success-screen {
+      text-align: center;
+    }
+    .success-icon {
+      font-size: 40px;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .success-screen h2 { margin-bottom: 10px; }
+    .success-screen p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn {
+      padding: 13px 28px;
+      border-radius: 2px;
+      font-size: 14px;
+      font-family: 'Noto Serif KR', serif;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.02em;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--cream);
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-ghost {
+      background: none;
+      color: var(--muted);
+      padding-left: 0;
+      font-weight: 400;
+    }
+    .btn-ghost:hover { color: var(--ink); }
+    .btn-accent {
+      background: var(--accent);
+      color: var(--cream);
+    }
+    .btn-accent:hover { opacity: 0.88; }
+    .btn-accent:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    @media (max-width: 500px) {
+      .card { padding: 32px 24px; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="step-indicator" id="stepIndicator"></div>
+
+  <!-- SCREEN 1: INTRO -->
+  <div class="screen active" id="screen1">
+    <div class="card">
+      <div class="tag">연구 참가자 모집</div>
+      <h1> 연구 참여자를 모집합니다.</h1>
+      <p class="intro-body">
+        본 연구는 <strong>온라인 환경에서의 정보 자료 사용 경험</strong>에 관한 것으로,
+        용어-정의 쌍으로 된 자료들을 확인할때 어떠한 정서적 경험을 하는지 확인하는 것에 목적이 있습니다.<br><br>
+        참여를 통해 얻은 데이터는 학술 목적으로만 사용되며, 개인 정보는 철저히 보호됩니다.
+        참가에 대한 보상으로 <strong>현금 2만원</strong>이 즉시 제공됩니다.
+        
+        
+      </p>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">소요 시간</div>
+          <div class="info-value">약 40-50분</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">참가 보상</div>
+          <div class="info-value">현금 20,000원</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">대상</div>
+          <div class="info-value">서울대학교 학부생(미성년자 제외, 대학원생 제외)</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">진행 방식</div>
+          <div class="info-value">사범대 내 강의실에서 대면 실험</div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#8a7f74; line-height:1.7; margin-bottom:24px; padding-top:16px; border-top:1px solid var(--line);">
+  연구에 대한 문의는 : 서울대학교 교육학과 소속 박사수료생 안은지
+  (<a href="mailto:unji0604@snu.ac.kr" style="color:var(--accent); text-decoration:none;">unji0604@snu.ac.kr</a>)
+  에게 해주세요
+</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goTo(2)">참가 신청하기 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: CALENDAR -->
+  <div class="screen" id="screen2">
+    <div class="card">
+      <div class="tag">일정 선택</div>
+      <h2>가능한 날짜와 시간을 선택해 주세요</h2>
+      <p class="sub">날짜를 클릭하면 해당 날 가능한 시간대를 고를 수 있습니다. 여러 날짜 중복 선택 가능합니다.</p>
+
+      <div class="month-nav">
+        <button class="nav-btn" onclick="prevMonth()">‹</button>
+        <span class="month-label" id="monthLabel"></span>
+        <button class="nav-btn" onclick="nextMonth()">›</button>
+      </div>
+
+      <div class="cal-grid" id="calGrid">
+        <div class="cal-day-header">일</div>
+        <div class="cal-day-header">월</div>
+        <div class="cal-day-header">화</div>
+        <div class="cal-day-header">수</div>
+        <div class="cal-day-header">목</div>
+        <div class="cal-day-header">금</div>
+        <div class="cal-day-header">토</div>
+      </div>
+
+      <div class="time-section" id="timeSection" style="display:none;">
+        <div class="time-label" id="timePanelLabel"></div>
+        <div class="time-grid" id="timeGrid"></div>
+      </div>
+
+      <div class="selection-summary" id="selectionSummary">
+        날짜를 클릭하면 시간대를 선택할 수 있습니다.
+      </div>
+
+      <br>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="toStep3Btn" onclick="goTo(3)" disabled>다음 →</button>
+        <button class="btn btn-ghost" onclick="goTo(1)">← 이전</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: EMAIL -->
+  <div class="screen" id="screen3">
+    <div class="card" id="step3Card">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── State ──
+  const state = {
+    currentScreen: 1,
+    currentYear: new Date().getFullYear(),
+    currentMonth: new Date().getMonth(),
+    dateTimeMap: {},   // { 'YYYY-MM-DD': Set<time> }
+    activeDate: null,  // 현재 시간 패널이 열린 날짜
+    email: ''
+  };
+
+  const TIMES = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+
+  // ── Navigation ──
+  function goTo(n) {
+    if (n === 3) renderStep3();
+    const prev = document.getElementById('screen' + state.currentScreen);
+    prev.classList.add('exit');
+    setTimeout(() => { prev.classList.remove('active', 'exit'); }, 350);
+
+    state.currentScreen = n;
+    const next = document.getElementById('screen' + n);
+    setTimeout(() => { next.classList.add('active'); }, 80);
+
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = ((state.currentScreen - 1) / 2) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('stepIndicator').textContent = state.currentScreen + ' / 3';
+  }
+
+  // ── Calendar ──
+  function renderCalendar() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const y = state.currentYear, m = state.currentMonth;
+    document.getElementById('monthLabel').textContent = `${y}년 ${m+1}월`;
+
+    const grid = document.getElementById('calGrid');
+    while (grid.children.length > 7) grid.removeChild(grid.lastChild);
+
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m+1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day empty';
+      grid.appendChild(el);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(y, m, d);
+      const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const el = document.createElement('div');
+      el.className = 'cal-day';
+      el.textContent = d;
+
+      if (date < today) {
+        el.classList.add('past');
+      } else {
+        if (date.toDateString() === today.toDateString()) el.classList.add('today');
+        if (state.dateTimeMap[dateStr] && state.dateTimeMap[dateStr].size > 0) el.classList.add('selected');
+        if (state.activeDate === dateStr) el.classList.add('active-date');
+        el.onclick = () => selectDate(dateStr);
+      }
+      grid.appendChild(el);
+    }
+
+    renderTimePanel();
+  }
+
+  function selectDate(dateStr) {
+    // 같은 날짜 다시 클릭 → 패널 닫기
+    if (state.activeDate === dateStr) {
+      state.activeDate = null;
+      renderCalendar();
+      updateSummary();
+      return;
+    }
+
+    // 현재 열린 날짜에 시간이 하나도 선택 안 됐으면 이동 차단
+    if (state.activeDate) {
+      const current = state.dateTimeMap[state.activeDate];
+      if (!current || current.size === 0) {
+        const [, m, d] = state.activeDate.split('-');
+        alert(`${parseInt(m)}월 ${parseInt(d)}일의 시간대를 먼저 선택해 주세요.`);
+        return;
+      }
+    }
+
+    state.activeDate = dateStr;
+    if (!state.dateTimeMap[dateStr]) state.dateTimeMap[dateStr] = new Set();
+    renderCalendar();
+    updateSummary();
+  }
+
+  function prevMonth() {
+    if (state.activeDate) {
+      const current = state.dateTimeMap[state.activeDate];
+      if (!current || current.size === 0) {
+        const [, m, d] = state.activeDate.split('-');
+        alert(`${parseInt(m)}월 ${parseInt(d)}일의 시간대를 먼저 선택해 주세요.`);
+        return;
+      }
+    }
+    state.activeDate = null;
+    if (state.currentMonth === 0) { state.currentMonth = 11; state.currentYear--; }
+    else state.currentMonth--;
+    renderCalendar();
+  }
+
+  function nextMonth() {
+    if (state.activeDate) {
+      const current = state.dateTimeMap[state.activeDate];
+      if (!current || current.size === 0) {
+        const [, m, d] = state.activeDate.split('-');
+        alert(`${parseInt(m)}월 ${parseInt(d)}일의 시간대를 먼저 선택해 주세요.`);
+        return;
+      }
+    }
+    state.activeDate = null;
+    if (state.currentMonth === 11) { state.currentMonth = 0; state.currentYear++; }
+    else state.currentMonth++;
+    renderCalendar();
+  }
+
+  // ── Time Panel (날짜별) ──
+  function renderTimePanel() {
+    const section = document.getElementById('timeSection');
+    if (!state.activeDate) {
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = 'block';
+    const [, m, d] = state.activeDate.split('-');
+    document.getElementById('timePanelLabel').textContent =
+      `${parseInt(m)}월 ${parseInt(d)}일 — 가능한 시간대`;
+
+    const grid = document.getElementById('timeGrid');
+    grid.innerHTML = '';
+    const selected = state.dateTimeMap[state.activeDate] || new Set();
+
+    TIMES.forEach(t => {
+      const chip = document.createElement('div');
+      chip.className = 'time-chip' + (selected.has(t) ? ' selected' : '');
+      chip.textContent = t;
+      chip.onclick = () => {
+        if (!state.dateTimeMap[state.activeDate]) state.dateTimeMap[state.activeDate] = new Set();
+        const s = state.dateTimeMap[state.activeDate];
+        if (s.has(t)) s.delete(t); else s.add(t);
+        renderCalendar();
+        updateSummary();
+      };
+      grid.appendChild(chip);
+    });
+  }
+
+  function updateSummary() {
+    const summary = document.getElementById('selectionSummary');
+    const btn = document.getElementById('toStep3Btn');
+    const entries = Object.entries(state.dateTimeMap)
+      .filter(([, times]) => times.size > 0)
+      .sort(([a], [b]) => a.localeCompare(b));
+
+    if (entries.length === 0) {
+      summary.innerHTML = '날짜를 클릭하면 시간대를 선택할 수 있습니다.';
+      btn.disabled = true;
+      return;
+    }
+
+    const html = entries.map(([dateStr, times]) => {
+      const [, m, d] = dateStr.split('-');
+      return `<span>${parseInt(m)}월 ${parseInt(d)}일</span> ${[...times].sort().join(', ')}`;
+    }).join('<br>');
+
+    summary.innerHTML = html;
+    btn.disabled = false;
+  }
+
+  // ── Step 3 ──
+  function renderStep3() {
+    const entries = Object.entries(state.dateTimeMap)
+      .filter(([, times]) => times.size > 0)
+      .sort(([a], [b]) => a.localeCompare(b));
+
+    const confirmRows = entries.map(([dateStr, times]) => {
+      const [, m, d] = dateStr.split('-');
+      return `<div class="confirm-row">
+        <span class="confirm-key">${parseInt(m)}월 ${parseInt(d)}일</span>
+        <span class="confirm-val">${[...times].sort().join(', ')}</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('step3Card').innerHTML = `
+      <div class="tag">연락처 입력</div>
+      <div class="email-icon">✉</div>
+      <h2> 연락 받으실 메일 주소를 꼭 입력해 주세요!</h2>
+      <p class="sub">실험 일정 확정 후 아래 이메일로 안내 드립니다.</p>
+
+      <div class="confirm-box">
+        ${confirmRows}
+      </div>
+
+      <label class="field-label" for="emailInput">이메일 주소</label>
+      <input class="email-input" type="email" id="emailInput" placeholder="example@email.com"
+        oninput="onEmailInput(this.value)" />
+      <p class="email-hint">* 실험 안내 및 확정 연락을 위해 사용됩니다.</p>
+
+      <div class="btn-row">
+        <button class="btn btn-accent" id="submitBtn" onclick="submit()" disabled>신청 완료 →</button>
+        <button class="btn btn-ghost" onclick="goTo(2)">← 이전</button>
+      </div>
+    `;
+  }
+
+  function onEmailInput(val) {
+    state.email = val;
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    document.getElementById('submitBtn').disabled = !ok;
+  }
+
+  function submit() {
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9ans4ul2bsREJSrXHho7jQjJrdVAizoeOUP1d80kAMnIW1kEoz4dvJvKO3GEnOSQc7Q/exec';
+
+  const entries = Object.entries(state.dateTimeMap)
+    .filter(([, times]) => times.size > 0)
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  const schedule = entries.map(([dateStr, times]) => {
+    const [, m, d] = dateStr.split('-');
+    return `${parseInt(m)}월 ${parseInt(d)}일: ${[...times].sort().join(', ')}`;
+  }).join(' / ');
+
+  const card = document.getElementById('step3Card');
+  card.innerHTML = `
+    <div class="success-screen">
+      <span class="success-icon">⏳</span>
+      <h2>제출 중...</h2>
+    </div>`;
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: state.email, schedule })
+  })
+  .then(() => {
+    card.innerHTML = `
+      <div class="success-screen">
+        <span class="success-icon">🎉</span>
+        <h2>신청이 완료되었습니다!</h2>
+        <p>
+          참여 신청해 주셔서 감사합니다.<br>
+          선택하신 일정 중 확정 후 <strong>${state.email}</strong>로<br>
+          안내 메일을 보내드리겠습니다.
+        </p>
+      </div>`;
+    document.getElementById('progressFill').style.width = '100%';
+  })
+  .catch(() => {
+    card.innerHTML = `
+      <div class="success-screen">
+        <span class="success-icon">⚠️</span>
+        <h2>오류가 발생했습니다</h2>
+        <p>잠시 후 다시 시도해 주세요.</p>
+        <br>
+        <button class="btn btn-ghost" onclick="goTo(2)">← 돌아가기</button>
+      </div>`;
+  });
+}
+
+  // ── Init ──
+  updateProgress();
+  renderCalendar();
+  updateSummary();
+</script>
+</body>
+</html>
