@@ -224,6 +224,12 @@
     .cal-day:hover:not(.empty):not(.past) { background: var(--hover); border-color: var(--line); }
     .cal-day.empty { pointer-events: none; }
     .cal-day.past { color: var(--line); pointer-events: none; }
+    .cal-day.closed {
+      color: #c8bfb8;
+      background: #f5f0ea;
+      cursor: pointer;
+    }
+    .cal-day.closed:hover { background: #ede6dc; border-color: #d9d0c3; }
     .cal-day.today { font-weight: 700; color: var(--accent); }
     .cal-day.selected {
       background: var(--selected-bg);
@@ -300,6 +306,28 @@
     .selection-summary span {
       color: var(--ink);
       font-weight: 600;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1714;
+      color: #f5f0e8;
+      font-size: 13px;
+      padding: 12px 22px;
+      border-radius: 2px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     /* ── SCREEN 3 – EMAIL ── */
@@ -444,7 +472,7 @@
       <div class="info-grid">
         <div class="info-item">
           <div class="info-label">소요 시간</div>
-          <div class="info-value">약 40-50분</div>
+          <div class="info-value">약 40분</div>
         </div>
         <div class="info-item">
           <div class="info-label">참가 보상</div>
@@ -460,7 +488,7 @@
         </div>
       </div>
       <p style="font-size:13px; color:#8a7f74; line-height:1.7; margin-bottom:24px; padding-top:16px; border-top:1px solid var(--line);">
-  연구에 대한 문의는 : 서울대학교 교육학과 소속 박사수료생 안은지
+  연구에 대한 문의는 서울대학교 교육학과 소속 박사수료생 안은지
   (<a href="mailto:unji0604@snu.ac.kr" style="color:var(--accent); text-decoration:none;">unji0604@snu.ac.kr</a>)
   에게 해주세요
 </p>
@@ -474,8 +502,8 @@
   <div class="screen" id="screen2">
     <div class="card">
       <div class="tag">일정 선택</div>
-      <h2>가능한 날짜와 시간을 선택해 주세요</h2>
-      <p class="sub">날짜를 클릭하면 해당 날 가능한 시간대를 고를 수 있습니다. 여러 날짜 중복 선택 가능합니다.</p>
+      <h2>가능한 날짜와 시간을 <strong>3개 이상</strong>선택해 주세요</h2>
+      <p class="sub">날짜를 클릭하면 해당 날 가능한 시간대를 고를 수 있습니다.</p>
 
       <div class="month-nav">
         <button class="nav-btn" onclick="prevMonth()">‹</button>
@@ -517,6 +545,7 @@
     </div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
   // ── State ──
@@ -529,7 +558,52 @@
     email: ''
   };
 
-  const TIMES = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+// ── 날짜별 가능 시간 설정 ──
+  // 날짜를 추가하면 활성화, 없으면 자동으로 비활성화 (회색 표시)
+  // 시간은 원하는 것만 골라서 넣으세요
+  const DATE_SCHEDULE = {
+    '2026-05-21': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
+    '2026-05-22': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-05-25': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-05-26': ['10:00', '11:00', '12:00', '13:00', '16:00','17:00','18:00'],
+    '2026-05-27': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00','18:00'],
+    '2026-05-28': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-05-29': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-01': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-02': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
+    '2026-06-03': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-05': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-08': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-09': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-10': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-11': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-12': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-15': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-16': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-17': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-18': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-19': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    '2026-06-20': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
+    // 날짜 계속 추가...
+  };
+
+  function getAvailableTimes(dateStr) {
+    return DATE_SCHEDULE[dateStr] || [];
+  }
+
+  function isDateClosed(dateStr) {
+    return getAvailableTimes(dateStr).length === 0;
+  }
+
+  // ── Toast ──
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
 
   // ── Navigation ──
   function goTo(n) {
@@ -555,6 +629,9 @@
   function renderCalendar() {
     const today = new Date();
     today.setHours(0,0,0,0);
+    const deadline = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+    deadline.setHours(23,59,59,999);
+
     const y = state.currentYear, m = state.currentMonth;
     document.getElementById('monthLabel').textContent = `${y}년 ${m+1}월`;
 
@@ -577,13 +654,21 @@
       el.className = 'cal-day';
       el.textContent = d;
 
-      if (date < today) {
+      if (date < today || date > deadline) {
         el.classList.add('past');
       } else {
         if (date.toDateString() === today.toDateString()) el.classList.add('today');
-        if (state.dateTimeMap[dateStr] && state.dateTimeMap[dateStr].size > 0) el.classList.add('selected');
-        if (state.activeDate === dateStr) el.classList.add('active-date');
-        el.onclick = () => selectDate(dateStr);
+        if (isDateClosed(dateStr)) {
+          el.classList.add('closed');
+          el.onclick = () => {
+            const [, mo, dd] = dateStr.split('-');
+            showToast(`${parseInt(mo)}월 ${parseInt(dd)}일은 선택이 불가합니다.`);
+          };
+        } else {
+          if (state.dateTimeMap[dateStr] && state.dateTimeMap[dateStr].size > 0) el.classList.add('selected');
+          if (state.activeDate === dateStr) el.classList.add('active-date');
+          el.onclick = () => selectDate(dateStr);
+        }
       }
       grid.appendChild(el);
     }
@@ -661,8 +746,9 @@
     const grid = document.getElementById('timeGrid');
     grid.innerHTML = '';
     const selected = state.dateTimeMap[state.activeDate] || new Set();
+    const availableTimes = getAvailableTimes(state.activeDate);
 
-    TIMES.forEach(t => {
+    availableTimes.forEach(t => {
       const chip = document.createElement('div');
       chip.className = 'time-chip' + (selected.has(t) ? ' selected' : '');
       chip.textContent = t;
@@ -742,32 +828,7 @@
   }
 
   function submit() {
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9ans4ul2bsREJSrXHho7jQjJrdVAizoeOUP1d80kAMnIW1kEoz4dvJvKO3GEnOSQc7Q/exec';
-
-  const entries = Object.entries(state.dateTimeMap)
-    .filter(([, times]) => times.size > 0)
-    .sort(([a], [b]) => a.localeCompare(b));
-
-  const schedule = entries.map(([dateStr, times]) => {
-    const [, m, d] = dateStr.split('-');
-    return `${parseInt(m)}월 ${parseInt(d)}일: ${[...times].sort().join(', ')}`;
-  }).join(' / ');
-
-  const card = document.getElementById('step3Card');
-  card.innerHTML = `
-    <div class="success-screen">
-      <span class="success-icon">⏳</span>
-      <h2>제출 중...</h2>
-    </div>`;
-
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: state.email, schedule })
-  })
-  .then(() => {
-    card.innerHTML = `
+    document.getElementById('step3Card').innerHTML = `
       <div class="success-screen">
         <span class="success-icon">🎉</span>
         <h2>신청이 완료되었습니다!</h2>
@@ -776,20 +837,10 @@
           선택하신 일정 중 확정 후 <strong>${state.email}</strong>로<br>
           안내 메일을 보내드리겠습니다.
         </p>
-      </div>`;
+      </div>
+    `;
     document.getElementById('progressFill').style.width = '100%';
-  })
-  .catch(() => {
-    card.innerHTML = `
-      <div class="success-screen">
-        <span class="success-icon">⚠️</span>
-        <h2>오류가 발생했습니다</h2>
-        <p>잠시 후 다시 시도해 주세요.</p>
-        <br>
-        <button class="btn btn-ghost" onclick="goTo(2)">← 돌아가기</button>
-      </div>`;
-  });
-}
+  }
 
   // ── Init ──
   updateProgress();
