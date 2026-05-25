@@ -562,7 +562,6 @@
   // 날짜를 추가하면 활성화, 없으면 자동으로 비활성화 (회색 표시)
   // 시간은 원하는 것만 골라서 넣으세요
   const DATE_SCHEDULE = {
-    '2026-05-25': ['10:00', '11:00', '12:00', '13:00', '15:00','16:00'],
     '2026-05-26': ['11:00', '12:00', '16:00','17:00','18:00'],
     '2026-05-27': ['10:00', '11:00', '13:00', '14:00', '17:00','18:00'],
     '2026-05-28': ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00','17:00'],
@@ -800,8 +799,8 @@
     document.getElementById('step3Card').innerHTML = `
       <div class="tag">연락처 입력</div>
       <div class="email-icon">✉</div>
-      <h2> 연락 받으실 메일 주소를 꼭 입력해 주세요!</h2>
-      <p class="sub">실험 안내 연락을 위해 사용됩니다.</p>
+      <h2>연락 받으실 정보를 입력해 주세요!</h2>
+      <p class="sub">실험 확정 및 리마인드 연락을 위해 사용됩니다.</p>
 
       <div class="confirm-box">
         ${confirmRows}
@@ -809,8 +808,13 @@
 
       <label class="field-label" for="emailInput">이메일 주소</label>
       <input class="email-input" type="email" id="emailInput" placeholder="example@email.com"
-        oninput="onEmailInput(this.value)" />
-      <p class="email-hint">* 실험 확정 연락을 이메일로 드리니, 참가 신청 후 이메일을 꼭 자주 확인해 주세요!!! </p>
+        oninput="onEmailInput()" />
+      <p class="email-hint">* 실험 확정 연락을 이메일로 드리니, 참가 신청 후 이메일을 꼭 자주 확인해 주세요!!!</p>
+
+      <label class="field-label" for="phoneInput" style="margin-top:8px;">휴대폰 번호</label>
+      <input class="email-input" type="tel" id="phoneInput" placeholder="010-0000-0000"
+        oninput="onEmailInput()" />
+      <p class="email-hint">* 실험 하루 전 리마인드 연락에 사용되며, 실험 종료 후 즉시 폐기됩니다.</p>
 
       <div class="btn-row">
         <button class="btn btn-accent" id="submitBtn" onclick="submit()" disabled>신청 완료 →</button>
@@ -819,14 +823,17 @@
     `;
   }
 
-  function onEmailInput(val) {
-    state.email = val;
-    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-    document.getElementById('submitBtn').disabled = !ok;
+  function onEmailInput() {
+    state.email = (document.getElementById('emailInput') || {}).value || '';
+    state.phone = (document.getElementById('phoneInput') || {}).value || '';
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);
+    const phoneOk = state.phone.trim().length >= 9;
+    const btn = document.getElementById('submitBtn');
+    if (btn) btn.disabled = !(emailOk && phoneOk);
   }
 
   function submit() {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxaep-l-taIlIO1hdDOMZcFrNmMXhyYuGaK0L-UjoswKL9btFOheyHCE3y7MBh4B0ugrg/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2d67t-xbBISSOY5SVYInL24HOtDh1x3YWyQtyclEWFWHLelksGS9Q9GevixDcl8UKZA/exec';
 
     const entries = Object.entries(state.dateTimeMap)
       .filter(([, times]) => times.size > 0)
@@ -848,7 +855,7 @@
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: state.email, schedule })
+      body: JSON.stringify({ email: state.email, phone: state.phone || '', schedule })
     })
     .then(() => {
       card.innerHTML = `
