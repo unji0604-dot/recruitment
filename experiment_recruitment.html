@@ -445,6 +445,28 @@
     .btn-accent:hover { opacity: 0.88; }
     .btn-accent:disabled { opacity: 0.35; cursor: not-allowed; }
 
+    /* ── CLOSED NOTICE ── */
+    .closed-notice {
+      background: var(--cream);
+      border: 1px solid var(--accent);
+      border-radius: 2px;
+      padding: 18px 20px;
+      margin-bottom: 32px;
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── FADED (모집 중단 시 기본 정보 흐리게) ── */
+    .faded {
+      opacity: 0.35;
+      pointer-events: none;
+      user-select: none;
+      filter: grayscale(40%);
+      transition: opacity 0.3s;
+    }
+
     @media (max-width: 500px) {
       .card { padding: 32px 24px; }
       .info-grid { grid-template-columns: 1fr; }
@@ -461,39 +483,45 @@
     <div class="card">
       <div class="tag">연구 참가자 모집</div>
       <h1> 연구 참여자를 모집합니다.</h1>
-      <p class="intro-body">
+      <p class="intro-body faded">
         본 연구는 <strong>온라인 환경에서의 정보 자료 사용 경험</strong>에 관한 것으로,
         용어-정의 쌍으로 된 자료들을 확인할때 어떠한 정서적 경험을 하는지 확인하는 것에 목적이 있습니다.<br><br>
         참여를 통해 얻은 데이터는 학술 목적으로만 사용되며, 개인 정보는 철저히 보호됩니다.
         참가에 대한 보상으로 <strong>현금 2만원</strong>이 즉시 제공됩니다.
-        
-        
       </p>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">소요 시간</div>
-          <div class="info-value">약 40분</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">참가 보상</div>
-          <div class="info-value">현금 20,000원</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">대상</div>
-          <div class="info-value">서울대학교 학부생(미성년자 제외, 졸업생 제외, 대학원생 제외)</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">진행 방식</div>
-          <div class="info-value">사범대 내 강의실에서 대면 실험</div>
-        </div>
+
+      <div class="closed-notice">
+        ※ 해당 연구는 2학기(9월)에 재개됩니다.<br>
+        1학기 모집은 완료되어 2학기부터 다시 시작됩니다. 이 링크를 통해 8월 마지막주부터 신청하실 수 있습니다.
       </div>
-      <p style="font-size:13px; color:#8a7f74; line-height:1.7; margin-bottom:24px; padding-top:16px; border-top:1px solid var(--line);">
-  연구에 대한 문의는 서울대학교 교육학과 소속 박사수료생 안은지
-  (<a href="mailto:unji0604@snu.ac.kr" style="color:var(--accent); text-decoration:none;">unji0604@snu.ac.kr</a>)
-  에게 해주세요
-</p>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="goTo(2)">참가 신청하기 →</button>
+
+      <div class="faded">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">소요 시간</div>
+            <div class="info-value">약 40분</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">참가 보상</div>
+            <div class="info-value">현금 20,000원</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">대상</div>
+            <div class="info-value">서울대학교 학부생(미성년자 제외, 졸업생 제외, 대학원생 제외)</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">진행 방식</div>
+            <div class="info-value">사범대 내 강의실에서 대면 실험</div>
+          </div>
+        </div>
+        <p style="font-size:13px; color:#8a7f74; line-height:1.7; margin-bottom:24px; padding-top:16px; border-top:1px solid var(--line);">
+    연구에 대한 문의는 서울대학교 교육학과 소속 박사수료생 안은지
+    (<a href="mailto:unji0604@snu.ac.kr" style="color:var(--accent); text-decoration:none;">unji0604@snu.ac.kr</a>)
+    에게 해주세요
+        </p>
+        <div class="btn-row">
+          <button class="btn btn-primary" disabled style="cursor:not-allowed;">현재 모집이 마감되었습니다</button>
+        </div>
       </div>
     </div>
   </div>
@@ -562,6 +590,8 @@
   // 날짜를 추가하면 활성화, 없으면 자동으로 비활성화 (회색 표시)
   // 시간은 원하는 것만 골라서 넣으세요
   const DATE_SCHEDULE = {
+    '2026-06-23': ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
+    '2026-06-24': ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
     '2026-06-25': ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
     '2026-06-29': ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
     '2026-06-30': ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
