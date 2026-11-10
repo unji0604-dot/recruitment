@@ -560,7 +560,7 @@
         <div>
   
           <div class="visit-title">실험 당일, 서울대학교 관악캠퍼스로<br>직접 방문하여 참여하는 대면 실험입니다.</div>
-          <div class="visit-desc">전국 어느 대학 학부생이든 참여할 수 있습니다. (서울대학교 재학생은 참여 불가)<br>정확한 강의실 위치는 일정 확정 메일로 안내해 드립니다.</div>
+          <div class="visit-desc">전국 어느 대학 학부생이든 참여할 수 있습니다. (서울대학교 재학생은 참여 불가)<br>정확한 강의실 위치는 일정 확정 연락(문자)으로 안내해 드립니다.</div>
         </div>
       </div>
 
@@ -592,11 +592,11 @@
           <div class="info-item wide hl">
             <div class="info-label">진행 장소</div>
             <div class="info-value">서울대학교 관악캠퍼스 사범대학 내 강의실 (대면)
-              <span class="note">서울특별시 관악구 관악로 1 · 상세 위치는 확정 메일로 안내</span>
+              <span class="note">서울특별시 관악구 관악로 1 · 상세 위치는 확정 연락 시 안내</span>
             </div>
           </div>
         
-          <div class="info-item">
+          <div class="info-item wide">
             <div class="info-label">참가 보상</div>
             <div class="info-value">현금 20,000원 (즉시 지급)</div>
           </div>
@@ -916,7 +916,7 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
 
       <div class="confirm-box">
         ${confirmRows}
-        <div class="place-line">📍 실험 장소: <strong>서울대학교 관악캠퍼스</strong> (상세 위치는 확정 메일로 안내)</div>
+        <div class="place-line">📍 실험 장소: <strong>서울대학교 관악캠퍼스</strong> (상세 위치는 확정 연락 시 안내)</div>
       </div>
 
       <label class="field-label" for="univInput">소속 대학교</label>
@@ -941,7 +941,6 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
   function onEmailInput() {
     state.email = (document.getElementById('emailInput') || {}).value || '';
     state.phone = (document.getElementById('phoneInput') || {}).value || '';
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);
     const phoneOk = state.phone.trim().length >= 9;
     state.univ = ((document.getElementById('univInput') || {}).value || '').trim();
     const isSnu = /서울대|seoul\s*national|snu/i.test(state.univ.replace(/\s/g, '')) && !/서울대학교병원/.test(state.univ);
@@ -949,7 +948,7 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
     if (univWarn) univWarn.style.display = isSnu ? 'block' : 'none';
     const univOk = state.univ.length >= 2 && !isSnu;
     const btn = document.getElementById('submitBtn');
-    if (btn) btn.disabled = !(emailOk && phoneOk && univOk);
+    if (btn) btn.disabled = !(phoneOk && univOk);
   }
 
   function submit() {
@@ -984,8 +983,8 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
           <h2>신청이 완료되었습니다!</h2>
           <p>
             참여 신청해 주셔서 감사합니다.<br>
-            선택하신 일정 중 확정 후 <strong>${state.email}</strong>로<br>
-            서울대학교 내 실험 장소와 함께 안내 메일을 보내드리겠습니다.
+            선택하신 일정 중 확정 후 <strong>${state.phone}</strong>로<br>
+            서울대학교 내 실험 장소와 함께 안내 연락을 드리겠습니다.
           </p>
         </div>`;
       document.getElementById('progressFill').style.width = '100%';
