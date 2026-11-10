@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>실험 참가자 모집</title>
+  <title>[서울대학교 대면 실험] 타대학 학부생 참가자 모집</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -467,9 +467,80 @@
       transition: opacity 0.3s;
     }
 
+    /* ── 서울대 방문 강조 ── */
+    .visit-banner {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: #fbefe6;
+      color: var(--ink);
+      border: 1px solid #ecc9b3;
+      border-left: 4px solid var(--accent);
+      border-radius: 2px;
+      padding: 20px 22px;
+      margin-bottom: 28px;
+    }
+    .visit-pin {
+      flex: none;
+      width: 40px; height: 40px;
+      background: #fff;
+      border: 1px solid #ecc9b3;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .visit-kicker {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .visit-title {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .visit-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #6b5f55;
+    }
+    .route {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 28px;
+      font-size: 13px;
+    }
+    .route-node {
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .route-node.to { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+    .route-line { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 11px); position: relative; }
+    .route-line::after { content: '›'; position: absolute; right: -4px; top: -11px; color: var(--accent); font-size: 16px; }
+    .info-item.wide { grid-column: 1 / -1; }
+    .info-item.hl { border-color: var(--accent); background: #fcf6f1; }
+    .info-value .note { display: block; font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+    .place-line {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--line);
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .univ-warn { color: #b91c1c; font-size: 12px; font-weight: 600; margin: -2px 0 20px; display: none; }
+
     @media (max-width: 500px) {
       .card { padding: 32px 24px; }
       .info-grid { grid-template-columns: 1fr; }
+      .visit-banner { padding: 18px; gap: 12px; }
+      .route { font-size: 12px; }
     }
   </style>
 </head>
@@ -481,37 +552,53 @@
   <!-- SCREEN 1: INTRO -->
   <div class="screen active" id="screen1">
     <div class="card">
-      <div class="tag">모집 종료</div>
-      <h1>모집이 끝났습니다.</h1>
+      <div class="tag">타대학 학부생 참가자 모집 · 서울대학교 대면 실험</div>
+      <h1>서울대학교에서 진행되는 연구에<br>참여할 <span style="color:var(--accent);">전국 대학생</span>을 모집합니다.</h1>
+
+      <div class="visit-banner">
+        <div class="visit-pin">📍</div>
+        <div>
+  
+          <div class="visit-title">실험 당일, 서울대학교 관악캠퍼스로<br>직접 방문하여 참여하는 대면 실험입니다.</div>
+          <div class="visit-desc">전국 어느 대학 학부생이든 참여할 수 있습니다. (서울대학교 재학생은 참여 불가)<br>정확한 강의실 위치는 일정 확정 메일로 안내해 드립니다.</div>
+        </div>
+      </div>
+
+      <div class="route">
+        <span class="route-node">○○대학교 학부생</span>
+        <span class="route-line"></span>
+        <span class="route-node to">서울대학교 관악캠퍼스</span>
+      </div>
+
       <p class="intro-body">
         본 연구는 <strong>온라인 환경에서의 정보 자료 사용 경험</strong>에 관한 것으로,
-        용어-정의 쌍으로 된 자료들을 확인할때 어떠한 정서적 경험을 하는지 확인하는 것에 목적이 있습니다.<br><br>
+        용어-정의 쌍으로 된 자료들을 확인할 때 어떠한 정서적 경험을 하는지 확인하는 것에 목적이 있습니다.<br><br>
         참여를 통해 얻은 데이터는 학술 목적으로만 사용되며, 개인 정보는 철저히 보호됩니다.
-        참가에 대한 보상으로 <strong>현금 2만원</strong>이 즉시 제공됩니다.
+        참가에 대한 보상으로 <strong>현금 2만원</strong>이 실험 종료 후 즉시 제공됩니다.
       </p>
 
       <div class="closed-notice">
-  참가자 모집이 종료되었습니다.<br>
-  <span style="color: var(--ink);">본 연구에 관심을 가져주셔서 감사합니다</span>
-</div>
+        <span style="color: var(--ink);">※ 연구 소요 시간: 약 40분</span><br>
+      </div>
 
-          <div class="faded">
+      <div>
         <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">소요 시간</div>
-            <div class="info-value">약 40분</div>
+          <div class="info-item wide hl">
+            <div class="info-label">대상</div>
+            <div class="info-value">서울대학교를 제외한 전국 대학의 학부생
+              <span class="note">미성년자, 학부졸업생, 대학원생, 외국인 제외</span>
+            </div>
           </div>
+          <div class="info-item wide hl">
+            <div class="info-label">진행 장소</div>
+            <div class="info-value">서울대학교 관악캠퍼스 사범대학 내 강의실 (대면)
+              <span class="note">서울특별시 관악구 관악로 1 · 상세 위치는 확정 메일로 안내</span>
+            </div>
+          </div>
+        
           <div class="info-item">
             <div class="info-label">참가 보상</div>
-            <div class="info-value">현금 20,000원</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">대상</div>
-            <div class="info-value">서울대학교 학부생(미성년자 제외, 졸업생 제외, 대학원생 제외, 외국인 제외)</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">진행 방식</div>
-            <div class="info-value">사범대 내 강의실에서 대면 실험</div>
+            <div class="info-value">현금 20,000원 (즉시 지급)</div>
           </div>
         </div>
         <p style="font-size:13px; color:#8a7f74; line-height:1.7; margin-bottom:24px; padding-top:16px; border-top:1px solid var(--line);">
@@ -519,8 +606,8 @@
     (<a href="mailto:unji0604@snu.ac.kr" style="color:var(--accent); text-decoration:none;">unji0604@snu.ac.kr</a>)
     에게 해주세요
         </p>
-                <div class="btn-row">
-          <button class="btn btn-primary" disabled>모집 마감</button>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="goTo(2)">참가 신청하기 →</button>
         </div>
       </div>
     </div>
@@ -531,7 +618,7 @@
     <div class="card">
       <div class="tag">일정 선택</div>
       <h2>가능한 날짜와 시간을 <strong>3개 이상</strong>선택해 주세요</h2>
-      <p class="sub">날짜를 클릭하면 해당 날 가능한 시간대를 고를 수 있습니다.</p>
+      <p class="sub">날짜를 클릭하면 해당 날 가능한 시간대를 고를 수 있습니다.<br>모든 일정은 <strong style="color:var(--ink);">서울대학교 관악캠퍼스</strong>에서 진행되니, 이동 시간을 고려해 선택해 주세요.</p>
 
       <div class="month-nav">
         <button class="nav-btn" onclick="prevMonth()">‹</button>
@@ -580,12 +667,22 @@
   // 날짜를 추가하면 활성화, 없으면 자동으로 비활성화 (회색 표시)
   // 시간은 원하는 것만 골라서 넣으세요
   const DATE_SCHEDULE = {
-    '2026-09-21': ['16:00'],
-    '2026-09-23': ['11:00','15:00'],
-    '2026-09-28': ['11:00', '12:00','13:00'],
-    '2026-09-29': ['11:00','12:00', '15:00', '16:00'],
-    '2026-09-30': ['12:00','13:00','14:00','15:00', '16:00'],
-    // 날짜 계속 추가...
+    '2026-11-16': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-17': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-18': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-19': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-20': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-23': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-24': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-25': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-26': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-27': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-11-30': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-12-01': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-12-02': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-12-03': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    '2026-12-04': ['10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'],
+    // 날짜 계속 추가... (안 되는 날짜는 줄을 지우고, 안 되는 시간은 배열에서 빼세요)
   };
   // ── State ──
   const state = {
@@ -819,17 +916,20 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
 
       <div class="confirm-box">
         ${confirmRows}
+        <div class="place-line">📍 실험 장소: <strong>서울대학교 관악캠퍼스</strong> (상세 위치는 확정 메일로 안내)</div>
       </div>
 
-      <label class="field-label" for="emailInput">이메일 주소</label>
-      <input class="email-input" type="email" id="emailInput" placeholder="example@email.com"
-        oninput="onEmailInput()" />
-      <p class="email-hint">* 실험 확정 연락을 이메일로 드리니, 참가 신청 후 이메일을 꼭 자주 확인해 주세요!!!</p>
+      <label class="field-label" for="univInput">소속 대학교</label>
+      <input class="email-input" type="text" id="univInput" placeholder="예: ○○대학교"
+        style="font-family:'Noto Serif KR', serif;" oninput="onEmailInput()" />
+      <p class="univ-warn" id="univWarn">서울대학교 재학생은 본 모집에 참여하실 수 없습니다.</p>
+      <p class="email-hint" style="color:var(--muted); font-weight:400;">* 현재 재학 중인 대학교 이름을 정확히 입력해 주세요.</p>
+
 
       <label class="field-label" for="phoneInput" style="margin-top:8px;">휴대폰 번호</label>
       <input class="email-input" type="tel" id="phoneInput" placeholder="010-0000-0000"
         oninput="onEmailInput()" />
-      <p class="email-hint">* 실험 하루 전 리마인드 연락에 사용되며, 실험 종료 후 즉시 폐기됩니다.</p>
+      <p class="email-hint">* 실험 확정 안내 연락에 사용되며, 실험 종료 후 즉시 폐기됩니다.</p>
 
       <div class="btn-row">
         <button class="btn btn-accent" id="submitBtn" onclick="submit()" disabled>신청 완료 →</button>
@@ -843,8 +943,13 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
     state.phone = (document.getElementById('phoneInput') || {}).value || '';
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);
     const phoneOk = state.phone.trim().length >= 9;
+    state.univ = ((document.getElementById('univInput') || {}).value || '').trim();
+    const isSnu = /서울대|seoul\s*national|snu/i.test(state.univ.replace(/\s/g, '')) && !/서울대학교병원/.test(state.univ);
+    const univWarn = document.getElementById('univWarn');
+    if (univWarn) univWarn.style.display = isSnu ? 'block' : 'none';
+    const univOk = state.univ.length >= 2 && !isSnu;
     const btn = document.getElementById('submitBtn');
-    if (btn) btn.disabled = !(emailOk && phoneOk);
+    if (btn) btn.disabled = !(emailOk && phoneOk && univOk);
   }
 
   function submit() {
@@ -870,7 +975,7 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: state.email, phone: state.phone || '', schedule })
+      body: JSON.stringify({ email: state.email, phone: state.phone || '', univ: state.univ || '', schedule: `[소속: ${state.univ}] ` + schedule })
     })
     .then(() => {
       card.innerHTML = `
@@ -880,7 +985,7 @@ const deadline = scheduleDates.length > 0 ? new Date(scheduleDates.sort().pop() 
           <p>
             참여 신청해 주셔서 감사합니다.<br>
             선택하신 일정 중 확정 후 <strong>${state.email}</strong>로<br>
-            안내 메일을 보내드리겠습니다.
+            서울대학교 내 실험 장소와 함께 안내 메일을 보내드리겠습니다.
           </p>
         </div>`;
       document.getElementById('progressFill').style.width = '100%';
