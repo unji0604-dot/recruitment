@@ -579,15 +579,8 @@
       <h1>서울대학교에서 진행되는 연구에<br>참여할 <span style="color:var(--accent);">전국 대학생</span>을 모집합니다.</h1>
 
       <div class="urgent-notice">
-        <strong class="title">⏰ 모집 마감 임박 — 남은 시간이 얼마 없습니다!</strong>
-        신청이 거의 마감되어 아래 일정만 신청 가능합니다.
-        <div class="slot-list">
-          <span>11/16(월) 오후 2시</span>
-          <span>11/18(수) 오후 1시</span>
-          <span>11/19(목) 오전 11시</span>
-          <span>11/20(금) 오후 1시</span>
-          <span>12/1(화) 오후 4시</span>
-        </div>
+        <strong class="title">🔒 모집이 마감되었습니다</strong>
+        많은 관심 가져 주셔서 감사합니다. 모든 일정의 신청이 마감되어 더 이상 참가 신청을 받지 않습니다.
       </div>
 
       <div class="visit-banner">
@@ -642,7 +635,7 @@
     에게 해주세요
         </p>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="goTo(2)">참가 신청하기 →</button>
+          <button class="btn btn-primary" disabled>모집 마감</button>
         </div>
       </div>
     </div>
@@ -653,7 +646,7 @@
     <div class="card">
       <div class="tag">일정 선택</div>
       <h2>가능한 일정을 <strong>모두</strong> 선택해 주세요</h2>
-      <p class="sub"><strong style="color:#b91c1c;">모집이 거의 마감되어 남은 5개 일정 중에서만 선택할 수 있습니다.</strong><br>날짜를 클릭하면 해당 날 가능한 시간대를 고를 수 있습니다.<br>모든 일정은 <strong style="color:var(--ink);">서울대학교 관악캠퍼스</strong>에서 진행되니, 이동 시간을 고려해 선택해 주세요.</p>
+      <p class="sub"><strong style="color:#b91c1c;">모집이 거의 마감되어 남은 3개 일정 중에서만 선택할 수 있습니다.</strong><br>날짜를 클릭하면 해당 날 가능한 시간대를 고를 수 있습니다.<br>모든 일정은 <strong style="color:var(--ink);">서울대학교 관악캠퍼스</strong>에서 진행되니, 이동 시간을 고려해 선택해 주세요.</p>
 
       <div class="month-nav">
         <button class="nav-btn" onclick="prevMonth()">‹</button>
@@ -702,9 +695,7 @@
   // 날짜를 추가하면 활성화, 없으면 자동으로 비활성화 (회색 표시)
   // 시간은 원하는 것만 골라서 넣으세요
   const DATE_SCHEDULE = {
-    '2026-11-16': ['14:00'],
     '2026-11-18': ['13:00'],
-    '2026-11-19': ['11:00'],
     '2026-11-20': ['13:00'],
     '2026-12-01': ['16:00'],
     // 남은 일정만 표시됩니다. (마감된 시간은 배열에서 빼거나 줄을 지우세요)
@@ -741,6 +732,8 @@ currentMonth: Object.keys(DATE_SCHEDULE).length > 0 ? parseInt(Object.keys(DATE_
 
   // ── Navigation ──
   function goTo(n) {
+    if (n !== 1) return; // 모집 마감
+
     if (n === 3) renderStep3();
     const prev = document.getElementById('screen' + state.currentScreen);
     prev.classList.add('exit');
